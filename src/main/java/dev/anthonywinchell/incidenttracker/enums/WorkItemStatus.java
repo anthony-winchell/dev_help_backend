@@ -6,12 +6,7 @@ import java.util.Set;
 public enum WorkItemStatus {
     OPEN {
         public Set<WorkItemStatus> allowedTransitions() {
-           return Set.of(CLAIMED, CLOSED);
-        }
-    },
-    CLAIMED {
-        public Set<WorkItemStatus> allowedTransitions() {
-            return Set.of(IN_PROGRESS, OPEN);
+           return Set.of(IN_PROGRESS, CLOSED);
         }
     },
     IN_PROGRESS {

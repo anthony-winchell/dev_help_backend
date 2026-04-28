@@ -1,7 +1,9 @@
 package dev.anthonywinchell.incidenttracker.service;
 
+import dev.anthonywinchell.incidenttracker.dto.CreateProjectRequest;
 import dev.anthonywinchell.incidenttracker.entity.Project;
 import dev.anthonywinchell.incidenttracker.entity.User;
+import dev.anthonywinchell.incidenttracker.entity.WorkItem;
 import dev.anthonywinchell.incidenttracker.repository.ProjectRepository;
 import dev.anthonywinchell.incidenttracker.repository.UserRepository;
 import org.springframework.data.domain.Page;
@@ -21,10 +23,14 @@ public class ProjectService {
         this.userRepository = userRepository;
     }
 
-    public Project createProject(Project project, Long maintainerId) {
-        User maintainer = userRepository.findById(maintainerId)
-                .orElseThrow(() -> new RuntimeException("Maintainer not found"));
+    public Project createProject(CreateProjectRequest request) {
+        User maintainer = userRepository.findById(request.maintainerId)
+                .orElseThrow(() -> new RuntimeException("<aintainer not found"));
 
+        Project project = new Project();
+        project.setName(request.name);
+        project.setDescription(request.description);
+        project.setRepoUrl(request.repoUrl);
         project.setMaintainer(maintainer);
         return projectRepository.save(project);
     }
@@ -37,6 +43,11 @@ public class ProjectService {
     public Page<Project> getProjectsByMaintainerId(Long maintainerId, Pageable pageable) {
         return projectRepository.findAllByMaintainerId(maintainerId, pageable);
     }
+
+    public Page<Project> findAll(Pageable pageable) {
+        return projectRepository.findAll(pageable);
+    }
+
 
 
 }

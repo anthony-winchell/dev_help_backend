@@ -14,4 +14,6 @@ public interface WorkItemRepository extends JpaRepository<WorkItem, Long> {
     Page<WorkItem> findByAssigneeId(Long assigneeId, Pageable pageable);
     Page<WorkItem> findByReporterId(Long reporterId, Pageable pageable);
     Page<WorkItem> findByType(WorkItemType type, Pageable pageable);
+    Page<WorkItem> findByProjectId(Long projectId, Pageable pageable);
+    Page<WorkItem> findAll(Pageable pageable);
 }

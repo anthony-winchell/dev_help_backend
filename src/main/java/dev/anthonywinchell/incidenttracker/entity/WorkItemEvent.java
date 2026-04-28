@@ -34,9 +34,6 @@ public class WorkItemEvent {
     @JoinColumn(name = "user_id", nullable = false)
     private User actor;
 
-    @Column(nullable = false)
-    private String message;
-
     @CreationTimestamp
     private LocalDateTime createdAt;
 }
