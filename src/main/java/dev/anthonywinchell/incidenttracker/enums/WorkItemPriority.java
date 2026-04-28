@@ -1,6 +1,6 @@
 package dev.anthonywinchell.incidenttracker.enums;
 
-public enum IncidentSeverity {
+public enum WorkItemPriority {
     LOW,
     MEDIUM,
     HIGH,

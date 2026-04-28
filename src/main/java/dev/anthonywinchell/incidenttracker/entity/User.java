@@ -9,6 +9,7 @@ import org.hibernate.annotations.CreationTimestamp;
 import org.hibernate.annotations.UpdateTimestamp;
 
 import java.time.LocalDateTime;
+import java.util.List;
 
 @Entity
 @Table(name = "users")
@@ -31,6 +32,9 @@ public class User {
     @Column(nullable = false)
     @Size(min = 8, max = 255, message = "Password must be between 8 and 255 characters")
     private String password;
+
+    @OneToMany(fetch = FetchType.LAZY, mappedBy = "maintainer")
+    private List<Project> projects;
 
     @CreationTimestamp
     private LocalDateTime createdAt;

@@ -1,8 +1,8 @@
 package dev.anthonywinchell.incidenttracker.entity;
 
-import dev.anthonywinchell.incidenttracker.enums.IncidentSeverity;
-import dev.anthonywinchell.incidenttracker.enums.IncidentStatus;
-import dev.anthonywinchell.incidenttracker.enums.IncidentType;
+import dev.anthonywinchell.incidenttracker.enums.WorkItemPriority;
+import dev.anthonywinchell.incidenttracker.enums.WorkItemStatus;
+import dev.anthonywinchell.incidenttracker.enums.WorkItemType;
 import jakarta.persistence.*;
 import lombok.Getter;
 import lombok.Setter;
@@ -14,8 +14,8 @@ import java.time.LocalDateTime;
 @Entity
 @Getter
 @Setter
-@Table(name = "incidents")
-public class Incident {
+@Table(name = "work_items")
+public class WorkItem {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -28,15 +28,15 @@ public class Incident {
 
     @Enumerated(EnumType.STRING)
     @Column(nullable = false)
-    private IncidentSeverity severity;
+    private WorkItemPriority priority;
 
     @Enumerated(EnumType.STRING)
     @Column(nullable = false)
-    private IncidentType type;
+    private WorkItemType type;
 
     @Enumerated(EnumType.STRING)
     @Column(nullable = false)
-    private IncidentStatus status;
+    private WorkItemStatus status;
 
     @ManyToOne(fetch =  FetchType.LAZY)
     @JoinColumn(name = "reporter_id", nullable = false)
@@ -52,8 +52,8 @@ public class Incident {
     @UpdateTimestamp
     private LocalDateTime updatedAt;
 
-    public Incident() {
-        this.status = IncidentStatus.OPEN;
+    public WorkItem() {
+        this.status = WorkItemStatus.OPEN;
     }
 
 }

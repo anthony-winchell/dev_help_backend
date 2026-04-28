@@ -1,6 +1,6 @@
 package dev.anthonywinchell.incidenttracker.entity;
 
-import dev.anthonywinchell.incidenttracker.enums.IncidentStatus;
+import dev.anthonywinchell.incidenttracker.enums.WorkItemStatus;
 import jakarta.persistence.*;
 import lombok.Getter;
 import lombok.Setter;
@@ -11,8 +11,8 @@ import java.time.LocalDateTime;
 @Entity
 @Getter
 @Setter
-@Table(name = "incident_events")
-public class IncidentEvent {
+@Table(name = "work_item_events")
+public class WorkItemEvent {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -20,15 +20,15 @@ public class IncidentEvent {
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "incident_id", nullable = false)
-    private Incident incident;
+    private WorkItem workItem;
 
     @Enumerated(EnumType.STRING)
     @Column(nullable = false)
-    private IncidentStatus fromStatus;
+    private WorkItemStatus fromStatus;
 
     @Enumerated(EnumType.STRING)
     @Column(nullable = false)
-    private IncidentStatus toStatus;
+    private WorkItemStatus toStatus;
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "user_id", nullable = false)
