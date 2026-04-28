@@ -10,7 +10,7 @@ import org.springframework.data.domain.Pageable;
 
 public interface WorkItemRepository extends JpaRepository<WorkItem, Long> {
     Page<WorkItem> findByStatus(WorkItemStatus status, Pageable pageable);
-    Page<WorkItem> findBySeverity(WorkItemPriority severity, Pageable pageable);
+    Page<WorkItem> findByPriority(WorkItemPriority priority, Pageable pageable);
     Page<WorkItem> findByAssigneeId(Long assigneeId, Pageable pageable);
     Page<WorkItem> findByReporterId(Long reporterId, Pageable pageable);
     Page<WorkItem> findByType(WorkItemType type, Pageable pageable);

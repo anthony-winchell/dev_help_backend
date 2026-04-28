@@ -46,6 +46,10 @@ public class WorkItem {
     @JoinColumn(name = "assignee_id")
     private User assignee;
 
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "project_id", nullable = false)
+    private Project project;
+
     @CreationTimestamp
     private LocalDateTime createdAt;
 
