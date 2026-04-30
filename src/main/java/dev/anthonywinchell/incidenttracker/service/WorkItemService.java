@@ -11,8 +11,10 @@ import dev.anthonywinchell.incidenttracker.repository.ProjectRepository;
 import dev.anthonywinchell.incidenttracker.repository.WorkItemEventRepository;
 import dev.anthonywinchell.incidenttracker.repository.WorkItemRepository;
 import dev.anthonywinchell.incidenttracker.repository.UserRepository;
+import dev.anthonywinchell.incidenttracker.security.WorkItemPolicy;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
 
 @Service
@@ -22,15 +24,24 @@ public class WorkItemService {
     private final UserRepository userRepository;
     private final WorkItemEventRepository workItemEventRepository;
     private final ProjectRepository projectRepository;
+    private final WorkItemPolicy workItemPolicy;
 
     public WorkItemService(WorkItemRepository workItemRepository,
                            UserRepository userRepository,
                            WorkItemEventRepository workItemEventRepository,
-                           ProjectRepository projectRepository) {
+                           ProjectRepository projectRepository, WorkItemPolicy workItemPolicy) {
         this.workItemRepository = workItemRepository;
         this.userRepository = userRepository;
         this.workItemEventRepository = workItemEventRepository;
         this.projectRepository = projectRepository;
+        this.workItemPolicy = workItemPolicy;
+    }
+
+    private User getCurrentUser() {
+        return (User) SecurityContextHolder
+                .getContext()
+                .getAuthentication()
+                .getPrincipal();
     }
 
     public Page<WorkItem> findAll(Pageable pageable){
@@ -60,31 +71,27 @@ public class WorkItemService {
         WorkItem workItem = workItemRepository.findById(workItemId)
                 .orElseThrow(() -> new RuntimeException("WorkItem not found"));
 
+        User currentUser = getCurrentUser();
+
         WorkItemStatus currentStatus = workItem.getStatus();
 
-        if(request.newStatus == null){
-            throw new RuntimeException("newStatus can not be null");
-        }
-
-        if(!currentStatus.allowedTransitions().contains(request.newStatus)){
+        if (!currentStatus.allowedTransitions().contains(request.newStatus)){
             throw new RuntimeException("Invalid status transition");
         }
 
-        User actor = userRepository.findById(request.actorId)
-                .orElseThrow(() -> new RuntimeException("Actor not found"));
+        workItemPolicy.canUpdateStatus(currentUser, workItem);
 
         workItem.setStatus(request.newStatus);
         WorkItem saved = workItemRepository.save(workItem);
 
         WorkItemEvent event = new WorkItemEvent();
-        event.setWorkItem(saved);
+        event.setWorkItem(workItem);
         event.setFromStatus(currentStatus);
         event.setToStatus(request.newStatus);
-        event.setActor(actor);
-
+        event.setActor(currentUser);
         workItemEventRepository.save(event);
-        return saved;
 
+        return saved;
     }
 
     public Page<WorkItem> getWorkItemsByProjectId(Long projectId, Pageable pageable) {
@@ -95,26 +102,23 @@ public class WorkItemService {
         WorkItem workItem = workItemRepository.findById(workItemId)
                 .orElseThrow(() -> new RuntimeException("WorkItem not found"));
 
-        if(workItem.getAssignee() != null){
-            throw new RuntimeException("Already claimed");
-        }
+        User currentUser = getCurrentUser();
+        workItemPolicy.canClaim(currentUser, workItem);
 
-        User user = userRepository.findById(userId)
-                .orElseThrow(() -> new RuntimeException("User not found"));
+        workItem.setAssignee(currentUser);
+        workItem.setStatus(WorkItemStatus.IN_PROGRESS);
 
-
-        WorkItemStatus currentStatus = workItem.getStatus();
-
-        workItem.setAssignee(user);
         WorkItem saved = workItemRepository.save(workItem);
 
         WorkItemEvent event = new WorkItemEvent();
-        event.setWorkItem(saved);
-        event.setFromStatus(currentStatus);
-        event.setToStatus(currentStatus);
-        event.setActor(user);
+        event.setWorkItem(workItem);
+        event.setFromStatus(WorkItemStatus.OPEN);
+        event.setToStatus(WorkItemStatus.IN_PROGRESS);
+        event.setActor(currentUser);
         workItemEventRepository.save(event);
+
         return saved;
+
     }
 
 }

@@ -8,6 +8,7 @@ import dev.anthonywinchell.incidenttracker.repository.ProjectRepository;
 import dev.anthonywinchell.incidenttracker.repository.UserRepository;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
 
 @Service
@@ -23,9 +24,19 @@ public class ProjectService {
         this.userRepository = userRepository;
     }
 
+    private User getCurrentUser() {
+        return (User) SecurityContextHolder
+                .getContext()
+                .getAuthentication()
+                .getPrincipal();
+    }
+
     public Project createProject(CreateProjectRequest request) {
-        User maintainer = userRepository.findById(request.maintainerId)
-                .orElseThrow(() -> new RuntimeException("<aintainer not found"));
+        User maintainer = getCurrentUser();
+
+        if (!maintainer.getId().equals(request.maintainerId)) {
+            throw new RuntimeException("Unauthorized");
+        }
 
         Project project = new Project();
         project.setName(request.name);
