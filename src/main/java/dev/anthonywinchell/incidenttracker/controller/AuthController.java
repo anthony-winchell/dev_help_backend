@@ -1,7 +1,10 @@
 package dev.anthonywinchell.incidenttracker.controller;
 
+import dev.anthonywinchell.incidenttracker.dto.AuthResponse;
 import dev.anthonywinchell.incidenttracker.dto.LoginRequest;
 import dev.anthonywinchell.incidenttracker.dto.RegisterRequest;
+import dev.anthonywinchell.incidenttracker.dto.UserResponse;
+import dev.anthonywinchell.incidenttracker.service.AuthService;
 import dev.anthonywinchell.incidenttracker.service.JwtService;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
@@ -14,47 +17,25 @@ import dev.anthonywinchell.incidenttracker.entity.User;
 @RequestMapping("/api/auth")
 public class AuthController {
 
-    private final UserRepository userRepository;
-    private final PasswordEncoder passwordEncoder;
-    private final JwtService jwtService;
+    private final AuthService authService;
 
-    public AuthController(UserRepository userRepository,
-                          PasswordEncoder passwordEncoder,
-                          JwtService jwtService) {
-        this.userRepository = userRepository;
-        this.passwordEncoder = passwordEncoder;
-        this.jwtService = jwtService;
+    public AuthController(AuthService authService) {
+        this.authService = authService;
     }
 
     @PostMapping("/register")
-    public User register(@RequestBody RegisterRequest request) {
-        User user = new User();
-        user.setUsername(request.username);
-        user.setEmail(request.email);
-        user.setPassword(passwordEncoder.encode(request.password));
-
-        return userRepository.save(user);
+    public AuthResponse register(@RequestBody RegisterRequest request) {
+        return authService.register(request);
     }
 
     @PostMapping("/login")
-    public String login(@RequestBody LoginRequest request) {
-        User user = userRepository.findByUsername(request.username).orElse(null);
-
-        if (user == null) {
-            return "User not found";
-        }
-
-        if (!passwordEncoder.matches(request.password, user.getPassword())) {
-            return "Invalid password";
-        }
-
-        return jwtService.generateToken(user);
+    public AuthResponse login(@RequestBody LoginRequest request) {
+        return authService.login(request);
     }
 
     @GetMapping("/me")
-    public User me(Authentication authentication) {
-        return (User) authentication.getPrincipal();
+    public UserResponse me(Authentication authentication) {
+        User user = (User) authentication.getPrincipal();
+        return new UserResponse(user);
     }
-
-
 }
