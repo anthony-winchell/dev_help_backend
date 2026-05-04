@@ -2,6 +2,7 @@ package dev.anthonywinchell.incidenttracker.service;
 
 import dev.anthonywinchell.incidenttracker.dto.ChangeWorkItemStatusRequest;
 import dev.anthonywinchell.incidenttracker.dto.CreateWorkItemRequest;
+import dev.anthonywinchell.incidenttracker.dto.WorkItemResponse;
 import dev.anthonywinchell.incidenttracker.entity.Project;
 import dev.anthonywinchell.incidenttracker.entity.WorkItem;
 import dev.anthonywinchell.incidenttracker.entity.WorkItemEvent;
@@ -44,30 +45,31 @@ public class WorkItemService {
                 .getPrincipal();
     }
 
-    public Page<WorkItem> findAll(Pageable pageable){
-        return workItemRepository.findAll(pageable);
+    public Page<WorkItemResponse> findAll(Pageable pageable){
+        return workItemRepository.findAll(pageable).map(this::toResponse);
     }
 
 
-    public WorkItem createWorkItem(Long projectId, CreateWorkItemRequest request) {
+    public WorkItemResponse createWorkItem(Long projectId, CreateWorkItemRequest request) {
         Project project = projectRepository.findById(projectId)
                 .orElseThrow(() -> new RuntimeException("Project not found"));
 
-        User reporter = userRepository.findById(request.reporterId)
-                .orElseThrow(() -> new RuntimeException("Reporter not found"));
+        User reporter = getCurrentUser();
+
         WorkItem workItem = new WorkItem();
-        workItem.setTitle(request.title);
-        workItem.setDescription(request.description);
-        workItem.setPriority(request.priority);
-        workItem.setType(request.type);
+        workItem.setTitle(request.getTitle());
+        workItem.setDescription(request.getDescription());
+        workItem.setPriority(request.getPriority());
+        workItem.setType(request.getType());
         workItem.setReporter(reporter);
         workItem.setStatus(WorkItemStatus.OPEN);
         workItem.setProject(project);
 
-        return workItemRepository.save(workItem);
+        WorkItem saved = workItemRepository.save(workItem);
+        return toResponse(saved);
     }
 
-    public WorkItem changeStatus(Long workItemId, ChangeWorkItemStatusRequest request) {
+    public WorkItemResponse changeStatus(Long workItemId, ChangeWorkItemStatusRequest request) {
         WorkItem workItem = workItemRepository.findById(workItemId)
                 .orElseThrow(() -> new RuntimeException("WorkItem not found"));
 
@@ -91,14 +93,14 @@ public class WorkItemService {
         event.setActor(currentUser);
         workItemEventRepository.save(event);
 
-        return saved;
+        return toResponse(saved);
     }
 
-    public Page<WorkItem> getWorkItemsByProjectId(Long projectId, Pageable pageable) {
-        return workItemRepository.findByProjectId(projectId, pageable);
+    public Page<WorkItemResponse> getWorkItemsByProjectId(Long projectId, Pageable pageable) {
+        return workItemRepository.findByProjectId(projectId, pageable).map(this::toResponse);
     }
 
-    public WorkItem claimWorkItem(Long workItemId, Long userId) {
+    public WorkItemResponse claimWorkItem(Long workItemId) {
         WorkItem workItem = workItemRepository.findById(workItemId)
                 .orElseThrow(() -> new RuntimeException("WorkItem not found"));
 
@@ -117,8 +119,22 @@ public class WorkItemService {
         event.setActor(currentUser);
         workItemEventRepository.save(event);
 
-        return saved;
+        return toResponse(saved);
 
+    }
+
+    private WorkItemResponse toResponse(WorkItem workItem) {
+        return new WorkItemResponse(
+                workItem.getId(),
+                workItem.getTitle(),
+                workItem.getDescription(),
+                workItem.getPriority(),
+                workItem.getType(),
+                workItem.getStatus(),
+                workItem.getReporter().getUsername(),
+                workItem.getAssignee() != null ? workItem.getAssignee().getUsername() : null,
+                workItem.getProject().getId()
+        );
     }
 
 }

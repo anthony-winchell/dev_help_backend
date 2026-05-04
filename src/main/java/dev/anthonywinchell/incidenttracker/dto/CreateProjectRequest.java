@@ -1,8 +1,10 @@
 package dev.anthonywinchell.incidenttracker.dto;
 
+import lombok.Getter;
+
+@Getter
 public class CreateProjectRequest {
-    public String name;
-    public String description;
-    public String repoUrl;
-    public Long maintainerId;
+    private String name;
+    private String description;
+    private String repoUrl;
 }

@@ -25,10 +25,6 @@ public class User {
     @Size(min = 8, max = 25, message = "Username must be between 8 and 25 characters")
     private String username;
 
-    @Column(nullable = false, unique = true)
-    @Email
-    private String email;
-
     @Column(nullable = false)
     @Size(min = 8, max = 255, message = "Password must be between 8 and 255 characters")
     private String password;

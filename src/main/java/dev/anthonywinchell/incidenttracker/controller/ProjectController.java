@@ -2,6 +2,8 @@ package dev.anthonywinchell.incidenttracker.controller;
 
 import dev.anthonywinchell.incidenttracker.dto.CreateProjectRequest;
 import dev.anthonywinchell.incidenttracker.dto.CreateWorkItemRequest;
+import dev.anthonywinchell.incidenttracker.dto.ProjectResponse;
+import dev.anthonywinchell.incidenttracker.dto.WorkItemResponse;
 import dev.anthonywinchell.incidenttracker.entity.Project;
 import dev.anthonywinchell.incidenttracker.entity.WorkItem;
 import dev.anthonywinchell.incidenttracker.service.ProjectService;
@@ -25,17 +27,17 @@ public class ProjectController {
     }
 
     @GetMapping
-    public Page<Project> getAllProjects(Pageable pageable) {
+    public Page<ProjectResponse> getAllProjects(Pageable pageable) {
         return projectService.findAll(pageable);
     }
 
     @GetMapping("/{projectId}")
-    public Project getProjectById(@PathVariable Long projectId) {
+    public ProjectResponse getProjectById(@PathVariable Long projectId) {
         return projectService.getProjectById(projectId);
     }
 
     @GetMapping("/maintainer/{maintainerId}")
-    public Page<Project> getProjectsByMaintainerId(
+    public Page<ProjectResponse> getProjectsByMaintainerId(
             @PathVariable Long maintainerId,
             Pageable pageable
     ) {
@@ -43,19 +45,19 @@ public class ProjectController {
     }
 
     @PostMapping()
-    public Project createProject(@RequestBody CreateProjectRequest request){
+    public ProjectResponse createProject(@RequestBody CreateProjectRequest request){
         return projectService.createProject(request);
     }
 
     @PostMapping("/{projectId}/work-items")
-    public WorkItem createWorkItem(@PathVariable Long projectId,
+    public WorkItemResponse createWorkItem(@PathVariable Long projectId,
                                    @RequestBody CreateWorkItemRequest request){
         return workItemService.createWorkItem(projectId, request);
     }
 
     @GetMapping("/{projectId}/work-items")
-    public Page<WorkItem> getWorkItemsByProjectId(@PathVariable Long projectId,
-                                                  Pageable pageable){
+    public Page<WorkItemResponse> getWorkItemsByProjectId(@PathVariable Long projectId,
+                                                          Pageable pageable){
         return workItemService.getWorkItemsByProjectId(projectId, pageable);
     }
 

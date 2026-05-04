@@ -2,6 +2,7 @@ package dev.anthonywinchell.incidenttracker.controller;
 
 import dev.anthonywinchell.incidenttracker.dto.ChangeWorkItemStatusRequest;
 import dev.anthonywinchell.incidenttracker.dto.CreateWorkItemRequest;
+import dev.anthonywinchell.incidenttracker.dto.WorkItemResponse;
 import dev.anthonywinchell.incidenttracker.entity.WorkItem;
 import dev.anthonywinchell.incidenttracker.service.WorkItemService;
 import org.springframework.data.domain.Page;
@@ -19,20 +20,21 @@ public class WorkItemController {
     }
 
     @GetMapping()
-    public Page<WorkItem> getAllWorkItems(Pageable pageable){
+    public Page<WorkItemResponse> getAllWorkItems(Pageable pageable){
         return workItemService.findAll(pageable);
     }
 
     @PatchMapping("/{id}/status")
-    public WorkItem changeStatus(@PathVariable Long id,
+    public WorkItemResponse changeStatus(@PathVariable Long id,
                                  @RequestBody ChangeWorkItemStatusRequest request){
         return workItemService.changeStatus(id, request);
     }
     //this is temporary and will be fixed once authentication is implemented
-    @PatchMapping("/{workItemId}/claim/{userId}")
-    public WorkItem claimWorkItem(@PathVariable Long workItemId, @PathVariable Long userId){
-        return workItemService.claimWorkItem(workItemId, userId);
+    @PatchMapping("/{workItemId}/claim")
+    public WorkItemResponse claimWorkItem(@PathVariable Long workItemId){
+        return workItemService.claimWorkItem(workItemId);
     }
+
 
 
 }

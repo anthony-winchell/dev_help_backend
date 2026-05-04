@@ -1,6 +1,7 @@
 package dev.anthonywinchell.incidenttracker.service;
 
 import dev.anthonywinchell.incidenttracker.dto.CreateProjectRequest;
+import dev.anthonywinchell.incidenttracker.dto.ProjectResponse;
 import dev.anthonywinchell.incidenttracker.entity.Project;
 import dev.anthonywinchell.incidenttracker.entity.User;
 import dev.anthonywinchell.incidenttracker.entity.WorkItem;
@@ -31,34 +32,42 @@ public class ProjectService {
                 .getPrincipal();
     }
 
-    public Project createProject(CreateProjectRequest request) {
+    public ProjectResponse createProject(CreateProjectRequest request) {
         User maintainer = getCurrentUser();
 
-        if (!maintainer.getId().equals(request.maintainerId)) {
-            throw new RuntimeException("Unauthorized");
-        }
-
         Project project = new Project();
-        project.setName(request.name);
-        project.setDescription(request.description);
-        project.setRepoUrl(request.repoUrl);
+        project.setName(request.getName());
+        project.setDescription(request.getDescription());
+        project.setRepoUrl(request.getRepoUrl());
         project.setMaintainer(maintainer);
-        return projectRepository.save(project);
+        Project saved = projectRepository.save(project);
+        return toResponse(saved);
     }
 
-    public Project getProjectById(Long projectId) {
+    public ProjectResponse getProjectById(Long projectId) {
         return projectRepository.findById(projectId)
+                .map(this::toResponse)
                 .orElseThrow(() -> new RuntimeException("Project not found"));
     }
 
-    public Page<Project> getProjectsByMaintainerId(Long maintainerId, Pageable pageable) {
-        return projectRepository.findAllByMaintainerId(maintainerId, pageable);
+    public Page<ProjectResponse> getProjectsByMaintainerId(Long maintainerId, Pageable pageable) {
+        return projectRepository.findAllByMaintainerId(maintainerId, pageable).map(
+                this::toResponse
+        );
     }
 
-    public Page<Project> findAll(Pageable pageable) {
-        return projectRepository.findAll(pageable);
+    public Page<ProjectResponse> findAll(Pageable pageable) {
+        return projectRepository.findAll(pageable).map(this::toResponse);
     }
 
-
+    private ProjectResponse toResponse(Project project) {
+        return new ProjectResponse(
+                project.getId(),
+                project.getName(),
+                project.getDescription(),
+                project.getRepoUrl(),
+                project.getMaintainer().getUsername()
+        );
+    }
 
 }
