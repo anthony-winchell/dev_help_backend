@@ -3,7 +3,6 @@ package dev.anthonywinchell.incidenttracker.service;
 import dev.anthonywinchell.incidenttracker.dto.AuthResponse;
 import dev.anthonywinchell.incidenttracker.dto.LoginRequest;
 import dev.anthonywinchell.incidenttracker.dto.RegisterRequest;
-import dev.anthonywinchell.incidenttracker.dto.UserResponse;
 import dev.anthonywinchell.incidenttracker.entity.User;
 import dev.anthonywinchell.incidenttracker.repository.UserRepository;
 import org.springframework.security.crypto.password.PasswordEncoder;
@@ -25,7 +24,6 @@ public class AuthService {
     public AuthResponse register(RegisterRequest request) {
         User user = new User();
         user.setUsername(request.username);
-        user.setEmail(request.email);
         user.setPassword(passwordEncoder.encode(request.password));
 
         userRepository.save(user);

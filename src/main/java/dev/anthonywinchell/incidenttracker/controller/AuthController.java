@@ -1,14 +1,18 @@
 package dev.anthonywinchell.incidenttracker.controller;
 
 import dev.anthonywinchell.incidenttracker.dto.LoginRequest;
+import dev.anthonywinchell.incidenttracker.dto.LoginResponse;
 import dev.anthonywinchell.incidenttracker.dto.RegisterRequest;
+import dev.anthonywinchell.incidenttracker.dto.UserResponse;
 import dev.anthonywinchell.incidenttracker.service.JwtService;
+import jakarta.validation.Valid;
+import org.springframework.http.HttpStatus;
 import org.springframework.security.core.Authentication;
-import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.web.bind.annotation.*;
 import dev.anthonywinchell.incidenttracker.repository.UserRepository;
 import dev.anthonywinchell.incidenttracker.entity.User;
+import org.springframework.web.server.ResponseStatusException;
 
 @RestController
 @RequestMapping("/api/auth")
@@ -27,35 +31,39 @@ public class AuthController {
     }
 
     @PostMapping("/register")
-    public User register(@RequestBody RegisterRequest request) {
+    public UserResponse register(@Valid @RequestBody RegisterRequest request) {
         User user = new User();
         user.setUsername(request.username.toLowerCase().trim());
         user.setPassword(passwordEncoder.encode(request.password));
 
-        return userRepository.save(user);
+        User saved = userRepository.save(user);
+        return new UserResponse(saved.getId(), saved.getUsername());
     }
 
     @PostMapping("/login")
-    public String login(@RequestBody LoginRequest request) {
+    public LoginResponse login(@Valid @RequestBody LoginRequest request) {
         User user = userRepository.findByUsername(request.username.toLowerCase().trim()).orElse(null);
 
-        if (user == null) {
-            return "User not found";
+        if(user == null || !passwordEncoder.matches(request.password, user.getPassword())) {
+            throw new ResponseStatusException(HttpStatus.UNAUTHORIZED, "Invalid username or password");
         }
 
-        if (!passwordEncoder.matches(request.password, user.getPassword())) {
-            return "Invalid password";
-        }
-
-        return jwtService.generateToken(user);
+        return new LoginResponse(jwtService.generateToken(user));
     }
 
     @GetMapping("/me")
-    public User me(Authentication authentication) {
-        if(authentication == null || !(authentication.getPrincipal() instanceof User)) {
-            throw new RuntimeException("Not authenticated");
+    public UserResponse me(Authentication authentication) {
+        if (authentication == null) {
+            throw new ResponseStatusException(HttpStatus.UNAUTHORIZED, "Not authenticated");
         }
-        return (User) authentication.getPrincipal();
+
+        String username = authentication.getName();
+
+        User user = userRepository.findByUsername(username).orElseThrow(
+                () -> new ResponseStatusException(HttpStatus.NOT_FOUND, "User not found")
+        );
+
+        return new UserResponse(user.getId(), user.getUsername());
 
     }
 
