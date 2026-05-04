@@ -12,6 +12,8 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.web.bind.annotation.*;
 
+import java.util.List;
+
 
 @RestController
 @RequestMapping("/api/projects")
@@ -27,8 +29,8 @@ public class ProjectController {
     }
 
     @GetMapping
-    public Page<ProjectResponse> getAllProjects(Pageable pageable) {
-        return projectService.findAll(pageable);
+    public List<ProjectResponse> getAllProjects() {
+        return projectService.findAll();
     }
 
     @GetMapping("/{projectId}")
@@ -37,11 +39,10 @@ public class ProjectController {
     }
 
     @GetMapping("/maintainer/{maintainerId}")
-    public Page<ProjectResponse> getProjectsByMaintainerId(
-            @PathVariable Long maintainerId,
-            Pageable pageable
+    public List<ProjectResponse> getProjectsByMaintainerId(
+            @PathVariable Long maintainerId
     ) {
-        return projectService.getProjectsByMaintainerId(maintainerId, pageable);
+        return projectService.getProjectsByMaintainerId(maintainerId);
     }
 
     @PostMapping()
@@ -56,9 +57,9 @@ public class ProjectController {
     }
 
     @GetMapping("/{projectId}/work-items")
-    public Page<WorkItemResponse> getWorkItemsByProjectId(@PathVariable Long projectId,
-                                                          Pageable pageable){
-        return workItemService.getWorkItemsByProjectId(projectId, pageable);
+    public List<WorkItemResponse> getWorkItemsByProjectId(@PathVariable Long projectId
+                                                          ){
+        return workItemService.getWorkItemsByProjectId(projectId);
     }
 
 }

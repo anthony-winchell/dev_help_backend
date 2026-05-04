@@ -6,7 +6,9 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.JpaRepository;
 import dev.anthonywinchell.incidenttracker.entity.Project;
 
+import java.util.List;
+
 public interface ProjectRepository extends JpaRepository<Project, Long> {
-    Page<Project> findAllByMaintainerId(Long maintainerId, Pageable pageable);
-    Page<Project> findAll(Pageable pageable);
+    List<Project> findAllByMaintainerId(Long maintainerId);
+    List<Project> findAll();
 }

@@ -18,11 +18,12 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
 
+import java.util.List;
+
 @Service
 public class WorkItemService {
 
     private final WorkItemRepository workItemRepository;
-    private final UserRepository userRepository;
     private final WorkItemEventRepository workItemEventRepository;
     private final ProjectRepository projectRepository;
     private final WorkItemPolicy workItemPolicy;
@@ -32,7 +33,6 @@ public class WorkItemService {
                            WorkItemEventRepository workItemEventRepository,
                            ProjectRepository projectRepository, WorkItemPolicy workItemPolicy) {
         this.workItemRepository = workItemRepository;
-        this.userRepository = userRepository;
         this.workItemEventRepository = workItemEventRepository;
         this.projectRepository = projectRepository;
         this.workItemPolicy = workItemPolicy;
@@ -45,8 +45,8 @@ public class WorkItemService {
                 .getPrincipal();
     }
 
-    public Page<WorkItemResponse> findAll(Pageable pageable){
-        return workItemRepository.findAll(pageable).map(this::toResponse);
+    public List<WorkItemResponse> findAll(){
+        return workItemRepository.findAll().stream().map(this::toResponse).toList();
     }
 
 
@@ -96,8 +96,8 @@ public class WorkItemService {
         return toResponse(saved);
     }
 
-    public Page<WorkItemResponse> getWorkItemsByProjectId(Long projectId, Pageable pageable) {
-        return workItemRepository.findByProjectId(projectId, pageable).map(this::toResponse);
+    public List<WorkItemResponse> getWorkItemsByProjectId(Long projectId) {
+        return workItemRepository.findByProjectId(projectId).stream().map(this::toResponse).toList();
     }
 
     public WorkItemResponse claimWorkItem(Long workItemId) {

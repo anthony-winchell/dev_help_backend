@@ -12,6 +12,8 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
 
+import java.util.List;
+
 @Service
 public class ProjectService {
 
@@ -50,14 +52,12 @@ public class ProjectService {
                 .orElseThrow(() -> new RuntimeException("Project not found"));
     }
 
-    public Page<ProjectResponse> getProjectsByMaintainerId(Long maintainerId, Pageable pageable) {
-        return projectRepository.findAllByMaintainerId(maintainerId, pageable).map(
-                this::toResponse
-        );
+    public List<ProjectResponse> getProjectsByMaintainerId(Long maintainerId) {
+        return projectRepository.findAllByMaintainerId(maintainerId).stream().map(this::toResponse).toList();
     }
 
-    public Page<ProjectResponse> findAll(Pageable pageable) {
-        return projectRepository.findAll(pageable).map(this::toResponse);
+    public List<ProjectResponse> findAll() {
+        return projectRepository.findAll().stream().map(this::toResponse).toList();
     }
 
     private ProjectResponse toResponse(Project project) {

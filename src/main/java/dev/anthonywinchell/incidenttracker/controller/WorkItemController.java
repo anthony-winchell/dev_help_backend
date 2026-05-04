@@ -9,6 +9,8 @@ import org.springframework.data.domain.Page;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.data.domain.Pageable;
 
+import java.util.List;
+
 @RestController
 @RequestMapping("/api/work-items")
 public class WorkItemController {
@@ -20,8 +22,8 @@ public class WorkItemController {
     }
 
     @GetMapping()
-    public Page<WorkItemResponse> getAllWorkItems(Pageable pageable){
-        return workItemService.findAll(pageable);
+    public List<WorkItemResponse> getAllWorkItems(){
+        return workItemService.findAll();
     }
 
     @PatchMapping("/{id}/status")
