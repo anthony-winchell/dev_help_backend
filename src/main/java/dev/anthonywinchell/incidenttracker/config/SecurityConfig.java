@@ -62,18 +62,24 @@ public class SecurityConfig {
 
                 // authorization rules
                 .authorizeHttpRequests(auth -> auth
-                        // allow preflight requests (CRITICAL)
-                        .requestMatchers(HttpMethod.OPTIONS, "/**").permitAll()
+                        // PUBLIC READ
+                        .requestMatchers(HttpMethod.GET, "/api/projects/**").permitAll()
+                        .requestMatchers(HttpMethod.GET, "/api/work-items/**").permitAll()
+                        .requestMatchers(HttpMethod.GET, "/api/users/**").permitAll()
 
-                        // auth endpoints
+
+                        // AUTH ROUTES
                         .requestMatchers("/api/auth/**").permitAll()
 
-                        // public reads
-                        .requestMatchers(HttpMethod.GET, "/api/projects/**").permitAll()
-                        .requestMatchers(HttpMethod.GET, "/api/users/**").permitAll()
-                        .requestMatchers(HttpMethod.GET, "/api/work-items/**").permitAll()
+                        // PROTECTED WRITE ACTIONS
+                        .requestMatchers(HttpMethod.POST, "/api/projects/**").authenticated()
+                        .requestMatchers(HttpMethod.PUT, "/api/projects/**").authenticated()
+                        .requestMatchers(HttpMethod.DELETE, "/api/projects/**").authenticated()
+                        .requestMatchers(HttpMethod.POST, "/api/work-items/**").authenticated()
+                        .requestMatchers(HttpMethod.PUT, "/api/work-items/**").authenticated()
+                        .requestMatchers(HttpMethod.DELETE, "/api/work-items/**").authenticated()
 
-                        // everything else protected
+                        // fallback
                         .anyRequest().authenticated()
                 )
 
