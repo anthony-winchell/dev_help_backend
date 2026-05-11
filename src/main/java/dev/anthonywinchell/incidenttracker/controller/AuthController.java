@@ -53,11 +53,19 @@ public class AuthController {
     }
 
     @GetMapping("/me")
-    public UserResponse me() {
-        User user = (User) SecurityContextHolder
-                .getContext()
-                .getAuthentication()
-                .getPrincipal();
+    public UserResponse me(Authentication authentication) {
+
+        if (authentication == null ||
+                !authentication.isAuthenticated() ||
+                authentication.getPrincipal().equals("anonymousUser")) {
+
+            throw new ResponseStatusException(
+                    HttpStatus.UNAUTHORIZED,
+                    "Not authenticated"
+            );
+        }
+
+        User user = (User) authentication.getPrincipal();
 
         return new UserResponse(user.getId(), user.getUsername());
     }
