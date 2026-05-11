@@ -35,7 +35,7 @@ public class Project {
     @JoinColumn(name = "maintainer_id", nullable = false)
     private User maintainer;
 
-    @OneToMany(mappedBy = "project")
+    @OneToMany(mappedBy = "project", cascade =  CascadeType.ALL, orphanRemoval = true)
     private List<WorkItem> workItems;
 
     @Column(nullable = false)

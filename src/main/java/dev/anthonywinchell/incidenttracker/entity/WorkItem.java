@@ -4,6 +4,7 @@ import dev.anthonywinchell.incidenttracker.enums.WorkItemPriority;
 import dev.anthonywinchell.incidenttracker.enums.WorkItemStatus;
 import dev.anthonywinchell.incidenttracker.enums.WorkItemType;
 import jakarta.persistence.*;
+import jakarta.validation.constraints.Size;
 import lombok.Getter;
 import lombok.Setter;
 import org.hibernate.annotations.CreationTimestamp;
@@ -22,8 +23,10 @@ public class WorkItem {
     private Long id;
 
     @Column(nullable = false)
+    @Size(min = 3, max = 100)
     private String title;
 
+    @Size(max = 1000)
     private String description;
 
     @Enumerated(EnumType.STRING)

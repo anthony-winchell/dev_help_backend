@@ -10,6 +10,7 @@ import dev.anthonywinchell.incidenttracker.service.ProjectService;
 import dev.anthonywinchell.incidenttracker.service.WorkItemService;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
+import org.springframework.security.core.Authentication;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;

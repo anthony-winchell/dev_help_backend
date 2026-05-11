@@ -28,10 +28,16 @@ public class ProjectService {
     }
 
     private User getCurrentUser() {
-        return (User) SecurityContextHolder
+        Object principal = SecurityContextHolder
                 .getContext()
                 .getAuthentication()
                 .getPrincipal();
+
+        if (!(principal instanceof User user)) {
+            throw new RuntimeException("User not authenticated");
+        }
+
+        return user;
     }
 
     public ProjectResponse createProject(CreateProjectRequest request) {
