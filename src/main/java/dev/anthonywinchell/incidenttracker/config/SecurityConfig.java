@@ -73,6 +73,7 @@ public class SecurityConfig {
 
                         // PROTECTED WRITE ACTIONS
                         .requestMatchers(HttpMethod.POST, "/api/projects/**").authenticated()
+                        .requestMatchers(HttpMethod.PATCH, "/api/work-items/**").authenticated()
                         .requestMatchers(HttpMethod.PUT, "/api/projects/**").authenticated()
                         .requestMatchers(HttpMethod.DELETE, "/api/projects/**").authenticated()
                         .requestMatchers(HttpMethod.POST, "/api/work-items/**").authenticated()
