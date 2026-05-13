@@ -1,16 +1,17 @@
 package dev.anthonywinchell.incidenttracker.controller;
 
-import dev.anthonywinchell.incidenttracker.dto.CreateProjectRequest;
-import dev.anthonywinchell.incidenttracker.dto.CreateWorkItemRequest;
-import dev.anthonywinchell.incidenttracker.dto.ProjectResponse;
-import dev.anthonywinchell.incidenttracker.dto.WorkItemResponse;
+import com.sun.tools.jconsole.JConsoleContext;
+import dev.anthonywinchell.incidenttracker.dto.*;
 import dev.anthonywinchell.incidenttracker.entity.Project;
+import dev.anthonywinchell.incidenttracker.entity.User;
 import dev.anthonywinchell.incidenttracker.entity.WorkItem;
 import dev.anthonywinchell.incidenttracker.service.ProjectService;
 import dev.anthonywinchell.incidenttracker.service.WorkItemService;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.security.core.Authentication;
+import org.springframework.security.core.context.SecurityContextHolder;
+import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
@@ -35,8 +36,20 @@ public class ProjectController {
     }
 
     @GetMapping("/{projectId}")
-    public ProjectResponse getProjectById(@PathVariable Long projectId) {
-        return projectService.getProjectById(projectId);
+    public ProjResp getProjectById(@PathVariable Long projectId) {
+        Project project = projectService.getProjectById(projectId);
+
+        Object principal = SecurityContextHolder.getContext()
+                .getAuthentication()
+                .getPrincipal();
+
+        String username = null; // default to null for unauthenticated users
+
+        if (principal instanceof User user) {
+            username = user.getUsername();
+        }
+
+        return new ProjResp(project, username);
     }
 
     @GetMapping("/maintainer/{maintainerId}")

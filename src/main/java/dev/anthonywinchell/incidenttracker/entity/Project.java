@@ -42,6 +42,8 @@ public class Project {
     @Pattern(regexp = "^https://github\\.com/[A-Za-z0-9_.-]+/[A-Za-z0-9_.-]+(\\.git)?$")
     private String repoUrl;
 
+
+
     @CreationTimestamp
     private LocalDateTime createdAt;
 

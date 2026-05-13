@@ -52,9 +52,8 @@ public class ProjectService {
         return toResponse(saved);
     }
 
-    public ProjectResponse getProjectById(Long projectId) {
+    public Project getProjectById(Long projectId) {
         return projectRepository.findById(projectId)
-                .map(this::toResponse)
                 .orElseThrow(() -> new RuntimeException("Project not found"));
     }
 
