@@ -80,6 +80,9 @@ public class SecurityConfig {
                         .requestMatchers(HttpMethod.PUT, "/api/work-items/**").authenticated()
                         .requestMatchers(HttpMethod.DELETE, "/api/work-items/**").authenticated()
 
+                        // PROTECTED GET
+                        .requestMatchers(HttpMethod.GET, "/api/users/me/**").authenticated()
+
                         // fallback
                         .anyRequest().authenticated()
                 )

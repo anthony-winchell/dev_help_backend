@@ -57,10 +57,6 @@ public class ProjectService {
                 .orElseThrow(() -> new RuntimeException("Project not found"));
     }
 
-    public List<ProjectResponse> getProjectsByMaintainerId(Long maintainerId) {
-        return projectRepository.findAllByMaintainerId(maintainerId).stream().map(this::toResponse).toList();
-    }
-
     public List<ProjectResponse> findAll() {
         return projectRepository.findAll().stream().map(this::toResponse).toList();
     }
@@ -75,4 +71,8 @@ public class ProjectService {
         );
     }
 
+    public List<ProjectResponse> getProjectsForCurrentUser() {
+        User currentUser = getCurrentUser();
+        return projectRepository.findAllByMaintainerId(currentUser.getId()).stream().map(this::toResponse).toList();
+    }
 }

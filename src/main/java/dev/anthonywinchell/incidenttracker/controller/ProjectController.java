@@ -52,13 +52,6 @@ public class ProjectController {
         return new ProjResp(project, username);
     }
 
-    @GetMapping("/maintainer/{maintainerId}")
-    public List<ProjectResponse> getProjectsByMaintainerId(
-            @PathVariable Long maintainerId
-    ) {
-        return projectService.getProjectsByMaintainerId(maintainerId);
-    }
-
     @PostMapping()
     public ProjectResponse createProject(@RequestBody CreateProjectRequest request){
         return projectService.createProject(request);

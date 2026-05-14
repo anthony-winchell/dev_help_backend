@@ -11,5 +11,4 @@ import java.util.List;
 public interface ProjectRepository extends JpaRepository<Project, Long> {
     List<Project> findAllByMaintainerId(Long maintainerId);
     List<Project> findAll();
-
 }
