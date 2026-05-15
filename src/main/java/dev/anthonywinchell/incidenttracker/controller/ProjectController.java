@@ -69,4 +69,9 @@ public class ProjectController {
         return workItemService.getWorkItemsByProjectId(projectId);
     }
 
+    @DeleteMapping("/{projectId}")
+    public ProjectResponse deleteProject(@PathVariable Long projectId) {
+        return projectService.deleteProject(projectId);
+    }
+
 }

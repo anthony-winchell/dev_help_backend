@@ -1,5 +1,6 @@
 package dev.anthonywinchell.incidenttracker.security;
 
+import dev.anthonywinchell.incidenttracker.entity.Project;
 import dev.anthonywinchell.incidenttracker.entity.User;
 import dev.anthonywinchell.incidenttracker.entity.WorkItem;
 import org.springframework.stereotype.Component;
@@ -23,6 +24,12 @@ public class WorkItemPolicy {
     public void canClose(User user, WorkItem workItem) {
         if (!workItem.getProject().getMaintainer().getId().equals(user.getId())) {
             throw new RuntimeException("Only maintainer can close");
+        }
+    }
+
+    public void canDelete(User user, Project project) {
+        if (!project.getMaintainer().getId().equals(user.getId())) {
+            throw new RuntimeException("Only maintainer can delete");
         }
     }
 }

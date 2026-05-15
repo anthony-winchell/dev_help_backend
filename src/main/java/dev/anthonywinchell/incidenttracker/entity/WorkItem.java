@@ -11,6 +11,7 @@ import org.hibernate.annotations.CreationTimestamp;
 import org.hibernate.annotations.UpdateTimestamp;
 
 import java.time.LocalDateTime;
+import java.util.List;
 
 @Entity
 @Getter
@@ -52,6 +53,11 @@ public class WorkItem {
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "project_id", nullable = false)
     private Project project;
+
+    @OneToMany(mappedBy = "workItem", cascade = CascadeType.ALL, orphanRemoval = true)
+    private List<WorkItemEvent> events;
+
+
 
     @CreationTimestamp
     private LocalDateTime createdAt;
