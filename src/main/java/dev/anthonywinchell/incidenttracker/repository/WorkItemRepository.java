@@ -1,5 +1,6 @@
 package dev.anthonywinchell.incidenttracker.repository;
 
+import dev.anthonywinchell.incidenttracker.entity.User;
 import dev.anthonywinchell.incidenttracker.entity.WorkItem;
 import dev.anthonywinchell.incidenttracker.enums.WorkItemPriority;
 import dev.anthonywinchell.incidenttracker.enums.WorkItemStatus;
@@ -18,4 +19,5 @@ public interface WorkItemRepository extends JpaRepository<WorkItem, Long> {
     Page<WorkItem> findByType(WorkItemType type, Pageable pageable);
     List<WorkItem> findByProjectId(Long projectId);
     List<WorkItem> findAll();
+    List<WorkItem> findByAssignee(User assignee);
 }

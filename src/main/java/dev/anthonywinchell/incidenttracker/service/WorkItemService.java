@@ -49,6 +49,11 @@ public class WorkItemService {
         return workItemRepository.findAll().stream().map(this::toResponse).toList();
     }
 
+    public List<WorkItemResponse> getAssignmentsForCurrentUser() {
+        User currentUser = getCurrentUser();
+        return workItemRepository.findByAssignee(currentUser).stream().map(this::toResponse).toList();
+    }
+
 
     public WorkItemResponse createWorkItem(Long projectId, CreateWorkItemRequest request) {
         Project project = projectRepository.findById(projectId)
