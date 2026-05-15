@@ -27,9 +27,15 @@ public class WorkItemPolicy {
         }
     }
 
-    public void canDelete(User user, Project project) {
+    public void canDeleteProject(User user, Project project) {
         if (!project.getMaintainer().getId().equals(user.getId())) {
             throw new RuntimeException("Only maintainer can delete");
+        }
+    }
+
+    public void canDeleteWorkItem(User user, WorkItem workItem) {
+        if (!workItem.getReporter().getId().equals(user.getId())) {
+            throw new RuntimeException("Only Maintainer can delete");
         }
     }
 }

@@ -37,6 +37,10 @@ public class WorkItemController {
         return workItemService.claimWorkItem(workItemId);
     }
 
+    @DeleteMapping("/{id}")
+    public WorkItemResponse deleteWorkItem(@PathVariable Long id){
+        return workItemService.deleteWorkItem(id);
+    }
 
 
 }

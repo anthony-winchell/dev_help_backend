@@ -88,7 +88,7 @@ public class ProjectService {
         if (currentProj == null) {
             throw new RuntimeException("Project not found");
         }
-        workItemPolicy.canDelete(currentUser, currentProj);
+        workItemPolicy.canDeleteProject(currentUser, currentProj);
         projectRepository.deleteById(projectId);
         return toResponse(currentProj);
 

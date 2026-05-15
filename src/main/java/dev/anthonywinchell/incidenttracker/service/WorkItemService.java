@@ -101,6 +101,11 @@ public class WorkItemService {
         return toResponse(saved);
     }
 
+    private WorkItem getWorkItemById(Long workItemId) {
+        return workItemRepository.findById(workItemId)
+                .orElseThrow(() -> new RuntimeException("WorkItem not found"));
+    }
+
     public List<WorkItemResponse> getWorkItemsByProjectId(Long projectId) {
         return workItemRepository.findByProjectId(projectId).stream().map(this::toResponse).toList();
     }
@@ -126,6 +131,14 @@ public class WorkItemService {
 
         return toResponse(saved);
 
+    }
+
+    public WorkItemResponse deleteWorkItem(Long workItemId) {
+        WorkItem currentWorkItem = getWorkItemById(workItemId);
+        User currentUser = getCurrentUser();
+        workItemPolicy.canDeleteWorkItem(currentUser, currentWorkItem);
+        workItemRepository.deleteById(currentWorkItem.getId());
+        return toResponse(currentWorkItem);
     }
 
     private WorkItemResponse toResponse(WorkItem workItem) {
