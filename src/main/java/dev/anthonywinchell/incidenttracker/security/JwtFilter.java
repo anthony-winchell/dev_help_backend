@@ -41,21 +41,32 @@ public class JwtFilter extends OncePerRequestFilter {
 
         String path = request.getRequestURI();
 
-        if (
-                path.equals("/api/auth/login") ||
-                        path.equals("/api/auth/register")
-        ) {
+        if (path.startsWith("/api/auth/")) {
             filterChain.doFilter(request, response);
             return;
         }
 
         String header = request.getHeader("Authorization");
 
-// BEFORE (breaks optional auth on public routes)
-        if (header == null || !header.startsWith("Bearer ")) {
-            filterChain.doFilter(request, response);
-            return;  // ← exits here, principal stays "anonymousUser"
+        if (header != null && header.startsWith("Bearer ")) {
+            try {
+                String token = header.substring(7);
+                String username = jwtService.extractUsername(token);
+
+                User user = userRepository.findByUsername(username).orElse(null);
+
+                if (user != null) {
+                    UsernamePasswordAuthenticationToken auth =
+                            new UsernamePasswordAuthenticationToken(user, null, List.of());
+
+                    SecurityContextHolder.getContext().setAuthentication(auth);
+                }
+            } catch (Exception ignored) {
+                // fail silently → continue request
+            }
         }
+
+        filterChain.doFilter(request, response);
 
 // AFTER
         if (header != null && header.startsWith("Bearer ")) {
