@@ -33,8 +33,8 @@ public class JwtFilter extends OncePerRequestFilter {
                                     FilterChain filterChain)
             throws ServletException, IOException {
 
-        // MUST BE FIRST
-        if ("OPTIONS".equals(request.getMethod())) {
+        // Let OPTIONS pass through so Spring's CORS filter can add headers
+        if (request.getMethod().equals("OPTIONS")) {
             filterChain.doFilter(request, response);
             return;
         }
@@ -58,33 +58,12 @@ public class JwtFilter extends OncePerRequestFilter {
                 if (user != null) {
                     UsernamePasswordAuthenticationToken auth =
                             new UsernamePasswordAuthenticationToken(user, null, List.of());
-
                     SecurityContextHolder.getContext().setAuthentication(auth);
                 }
             } catch (Exception ignored) {
-                // fail silently → continue request
+                // fail silently
             }
         }
 
-        filterChain.doFilter(request, response);
-
-// AFTER
-        if (header != null && header.startsWith("Bearer ")) {
-            try {
-                String token = header.substring(7);
-                String username = jwtService.extractUsername(token);
-
-                User user = userRepository.findByUsername(username).orElse(null);
-
-                if (user != null) {
-                    UsernamePasswordAuthenticationToken auth =
-                            new UsernamePasswordAuthenticationToken(user, null, List.of());
-                    SecurityContextHolder.getContext().setAuthentication(auth);
-                }
-            } catch (Exception ignored) {
-                // fail silently → continue request
-            }
-        }
-
-        filterChain.doFilter(request, response); // always reached
+        filterChain.doFilter(request, response); // called exactly once
     }}
