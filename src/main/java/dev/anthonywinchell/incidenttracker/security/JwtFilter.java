@@ -1,6 +1,5 @@
 package dev.anthonywinchell.incidenttracker.security;
 
-import dev.anthonywinchell.incidenttracker.entity.User;
 import dev.anthonywinchell.incidenttracker.repository.UserRepository;
 import dev.anthonywinchell.incidenttracker.service.JwtService;
 import jakarta.servlet.FilterChain;
@@ -33,7 +32,6 @@ public class JwtFilter extends OncePerRequestFilter {
                                     FilterChain filterChain)
             throws ServletException, IOException {
 
-        // Let OPTIONS pass through so Spring's CORS filter can add headers
         if (request.getMethod().equals("OPTIONS")) {
             filterChain.doFilter(request, response);
             return;
@@ -53,17 +51,24 @@ public class JwtFilter extends OncePerRequestFilter {
                 String token = header.substring(7);
                 String username = jwtService.extractUsername(token);
 
-                User user = userRepository.findByUsername(username).orElse(null);
+                if (username != null) {
+                    userRepository.findByUsername(username).ifPresent(user -> {
 
-                if (user != null) {
-                    UsernamePasswordAuthenticationToken auth =
-                            new UsernamePasswordAuthenticationToken(user, null, List.of());
-                    SecurityContextHolder.getContext().setAuthentication(auth);
+                        UsernamePasswordAuthenticationToken auth =
+                                new UsernamePasswordAuthenticationToken(
+                                        username,
+                                        null,
+                                        List.of()
+                                );
+
+                        SecurityContextHolder.getContext().setAuthentication(auth);
+                    });
                 }
-            } catch (Exception ignored) {
-                // fail silently
+
+            } catch (Exception e) {
+                SecurityContextHolder.clearContext();
             }
         }
 
-        filterChain.doFilter(request, response); // called exactly once
+        filterChain.doFilter(request, response);
     }}
