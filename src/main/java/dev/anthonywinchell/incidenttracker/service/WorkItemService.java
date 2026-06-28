@@ -15,6 +15,7 @@ import dev.anthonywinchell.incidenttracker.repository.UserRepository;
 import dev.anthonywinchell.incidenttracker.security.WorkItemPolicy;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
+import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
 
@@ -27,6 +28,7 @@ public class WorkItemService {
     private final WorkItemEventRepository workItemEventRepository;
     private final ProjectRepository projectRepository;
     private final WorkItemPolicy workItemPolicy;
+    private final UserRepository userRepository;
 
     public WorkItemService(WorkItemRepository workItemRepository,
                            UserRepository userRepository,
@@ -36,13 +38,16 @@ public class WorkItemService {
         this.workItemEventRepository = workItemEventRepository;
         this.projectRepository = projectRepository;
         this.workItemPolicy = workItemPolicy;
+        this.userRepository = userRepository;
     }
 
     private User getCurrentUser() {
-        return (User) SecurityContextHolder
-                .getContext()
-                .getAuthentication()
-                .getPrincipal();
+        Authentication auth = SecurityContextHolder.getContext().getAuthentication();
+
+        if (auth == null || !auth.isAuthenticated()) {
+            throw new RuntimeException("Authentication required");
+        }
+        return userRepository.findByUsername(auth.getName()).orElseThrow(() -> new RuntimeException("User not found"));
     }
 
     public List<WorkItemResponse> findAll(){

@@ -12,6 +12,7 @@ import dev.anthonywinchell.incidenttracker.security.WorkItemPolicy;
 import org.hibernate.jdbc.Work;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
+import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
 
@@ -33,16 +34,11 @@ public class ProjectService {
     }
 
     private User getCurrentUser() {
-        Object principal = SecurityContextHolder
-                .getContext()
-                .getAuthentication()
-                .getPrincipal();
-
-        if (!(principal instanceof User user)) {
-            throw new RuntimeException("User not authenticated");
+        Authentication auth = SecurityContextHolder.getContext().getAuthentication();
+        if (auth == null || !auth.isAuthenticated()) {
+            throw new RuntimeException("Authentication required");
         }
-
-        return user;
+        return userRepository.findByUsername(auth.getName()).orElseThrow(() -> new RuntimeException("User not found"));
     }
 
     public ProjectResponse createProject(CreateProjectRequest request) {
