@@ -2,16 +2,10 @@ package dev.anthonywinchell.incidenttracker.service;
 
 import dev.anthonywinchell.incidenttracker.dto.CreateProjectRequest;
 import dev.anthonywinchell.incidenttracker.dto.ProjectResponse;
-import dev.anthonywinchell.incidenttracker.dto.WorkItemResponse;
 import dev.anthonywinchell.incidenttracker.entity.Project;
 import dev.anthonywinchell.incidenttracker.entity.User;
-import dev.anthonywinchell.incidenttracker.entity.WorkItem;
 import dev.anthonywinchell.incidenttracker.repository.ProjectRepository;
-import dev.anthonywinchell.incidenttracker.repository.UserRepository;
 import dev.anthonywinchell.incidenttracker.security.WorkItemPolicy;
-import org.hibernate.jdbc.Work;
-import org.springframework.data.domain.Page;
-import org.springframework.data.domain.Pageable;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
@@ -22,25 +16,20 @@ import java.util.List;
 public class ProjectService {
 
     private final ProjectRepository projectRepository;
-    private final UserRepository userRepository;
+    private final CurrentUserService currentUserService;
     private final WorkItemPolicy workItemPolicy;
 
     public ProjectService(
             ProjectRepository projectRepository,
-            UserRepository userRepository, WorkItemPolicy workItemPolicy) {
+            CurrentUserService currentUserService, WorkItemPolicy workItemPolicy) {
         this.projectRepository = projectRepository;
-        this.userRepository = userRepository;
+        this.currentUserService = currentUserService;
         this.workItemPolicy = workItemPolicy;
     }
 
     private User getCurrentUser() {
-        Authentication auth = SecurityContextHolder.getContext().getAuthentication();
-        if (auth == null || !auth.isAuthenticated()) {
-            throw new RuntimeException("Authentication required");
-        }
-        return userRepository.findByUsername(auth.getName()).orElseThrow(() -> new RuntimeException("User not found"));
+        return currentUserService.getCurrentUser();
     }
-
     public ProjectResponse createProject(CreateProjectRequest request) {
         User maintainer = getCurrentUser();
 

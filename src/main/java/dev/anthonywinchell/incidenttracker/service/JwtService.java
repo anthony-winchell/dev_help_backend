@@ -3,6 +3,7 @@ package dev.anthonywinchell.incidenttracker.service;
 import dev.anthonywinchell.incidenttracker.entity.User;
 import io.jsonwebtoken.Jwts;
 import io.jsonwebtoken.security.Keys;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 
 import java.nio.charset.StandardCharsets;
@@ -11,7 +12,8 @@ import java.util.Date;
 @Service
 public class JwtService {
 
-    private final String SECRET = "super-extra-secret-temporary-key";
+    @Value("${jwt.secret}")
+    private String SECRET;
 
     public String generateToken(User user){
         return Jwts.builder()

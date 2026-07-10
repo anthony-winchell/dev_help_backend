@@ -11,12 +11,7 @@ import dev.anthonywinchell.incidenttracker.enums.WorkItemStatus;
 import dev.anthonywinchell.incidenttracker.repository.ProjectRepository;
 import dev.anthonywinchell.incidenttracker.repository.WorkItemEventRepository;
 import dev.anthonywinchell.incidenttracker.repository.WorkItemRepository;
-import dev.anthonywinchell.incidenttracker.repository.UserRepository;
 import dev.anthonywinchell.incidenttracker.security.WorkItemPolicy;
-import org.springframework.data.domain.Page;
-import org.springframework.data.domain.Pageable;
-import org.springframework.security.core.Authentication;
-import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
@@ -28,26 +23,21 @@ public class WorkItemService {
     private final WorkItemEventRepository workItemEventRepository;
     private final ProjectRepository projectRepository;
     private final WorkItemPolicy workItemPolicy;
-    private final UserRepository userRepository;
+    private final CurrentUserService currentUserService;
 
     public WorkItemService(WorkItemRepository workItemRepository,
-                           UserRepository userRepository,
                            WorkItemEventRepository workItemEventRepository,
+                           CurrentUserService currentUserService,
                            ProjectRepository projectRepository, WorkItemPolicy workItemPolicy) {
         this.workItemRepository = workItemRepository;
         this.workItemEventRepository = workItemEventRepository;
         this.projectRepository = projectRepository;
         this.workItemPolicy = workItemPolicy;
-        this.userRepository = userRepository;
+        this.currentUserService = currentUserService;
     }
 
     private User getCurrentUser() {
-        Authentication auth = SecurityContextHolder.getContext().getAuthentication();
-
-        if (auth == null || !auth.isAuthenticated()) {
-            throw new RuntimeException("Authentication required");
-        }
-        return userRepository.findByUsername(auth.getName()).orElseThrow(() -> new RuntimeException("User not found"));
+        return currentUserService.getCurrentUser();
     }
 
     public List<WorkItemResponse> findAll(){
